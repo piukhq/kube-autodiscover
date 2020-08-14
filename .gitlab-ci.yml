@@ -1,0 +1,47 @@
+stages:
+  - test
+  - build
+
+test-golint:
+  stage: test
+  image: golangci/golangci-lint:v1.27.0
+  script:
+    - golangci-lint run -v
+
+build-develop-api:
+  stage: build
+  image: docker:latest
+  only:
+    refs:
+      - master
+    changes:
+      - Dockerfile-api
+      - cmd/api/**
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+  script:
+    - docker build --pull -t "$CI_REGISTRY/kube-autodiscover-api:latest" -f Dockerfile-api .
+    - docker tag "$CI_REGISTRY/kube-autodiscover-api:latest" "$CI_REGISTRY/kube-autodiscover-api:develop-$CI_COMMIT_SHORT_SHA"
+    - docker push "$CI_REGISTRY/kube-autodiscover-api:latest"
+    - docker push "$CI_REGISTRY/kube-autodiscover-api:develop-$CI_COMMIT_SHORT_SHA"
+
+build-develop-poster:
+  stage: build
+  image: docker:latest
+  only:
+    refs:
+      - master
+    changes:
+      - Dockerfile-poster
+      - cmd/poster/**
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+  script:
+    - docker build --pull -t "$CI_REGISTRY/kube-autodiscover-poster:latest" -f Dockerfile-poster .
+    - docker tag "$CI_REGISTRY/kube-autodiscover-poster:latest" "$CI_REGISTRY/kube-autodiscover-poster:develop-$CI_COMMIT_SHORT_SHA"
+    - docker push "$CI_REGISTRY/kube-autodiscover-poster:latest"
+    - docker push "$CI_REGISTRY/kube-autodiscover-poster:develop-$CI_COMMIT_SHORT_SHA"
