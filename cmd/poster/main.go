@@ -52,6 +52,7 @@ func main() {
 		}
 
 		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", "Token aa2d765e-b701-4ed2-8550-60a54af0e38d")
 
 		client := &http.Client{}
 		resp, err := client.Do(req)

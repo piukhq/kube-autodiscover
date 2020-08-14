@@ -23,6 +23,16 @@ func livez(w http.ResponseWriter, req *http.Request) {
 }
 
 func handler(w http.ResponseWriter, req *http.Request) {
+	if req.Method != "POST" && req.Method != "GET" {
+		w.WriteHeader(405)
+		return
+	}
+
+	if req.Header.Get("Authorization") != "Token aa2d765e-b701-4ed2-8550-60a54af0e38d" {
+		w.WriteHeader(401)
+		return
+	}
+
 	if req.Method == "POST" {
 		var c Cluster
 		if err := json.NewDecoder(req.Body).Decode(&c); err != nil {
@@ -63,8 +73,6 @@ func handler(w http.ResponseWriter, req *http.Request) {
 				w.WriteHeader(500)
 			}
 		}
-	} else {
-		w.WriteHeader(405)
 	}
 }
 
