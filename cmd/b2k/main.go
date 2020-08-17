@@ -2,10 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/alecthomas/kong"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 )
@@ -17,7 +20,14 @@ type Cluster struct {
 	LastSeen time.Time `json:"-"`
 }
 
+var CLI struct {
+	Email string `help:"Bink email to be used for Kube auth" env:"BINK_KUBE_EMAIL"`
+}
+
 func main() {
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	kong.Parse(&CLI)
+
 	req, err := http.NewRequest("GET", "https://cluster-autodiscover.uksouth.bink.sh", nil)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to make POST request")
@@ -45,6 +55,7 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to get kubectl config")
 	}
+	changed := false
 
 	// Find auth info
 	authInfo := ""
@@ -54,16 +65,26 @@ func main() {
 		}
 	}
 	if len(authInfo) == 0 {
-		log.Fatal().Msg("Could not find authInfo aka user, todo need to be able to add this...")
-	}
-	// kubectl config set-credentials yourusername@bink.com \
-	// --auth-provider=azure \
-	// --auth-provider-arg=environment=AzurePublicCloud \
-	// --auth-provider-arg=client-id=aeb43981-c317-4f08-97be-aeed19f91cb1 \
-	// --auth-provider-arg=apiserver-id=d250be93-618a-45e5-b9cf-6a156f536a00 \
-	// --auth-provider-arg=tenant-id=a6e2367a-92ea-4e5a-b565-723830bcc095
+		if len(CLI.Email) == 0 {
+			log.Fatal().Err(err).Msg("No bink user found, use --email argument to specify")
+		}
 
-	changed := false
+		newAuthInfo := &api.AuthInfo{
+			AuthProvider: &api.AuthProviderConfig{
+				Name: "azure",
+				Config: map[string]string{
+					"client-id":    "aeb43981-c317-4f08-97be-aeed19f91cb1",
+					"environment":  "AzurePublicCloud",
+					"apiserver-id": "d250be93-618a-45e5-b9cf-6a156f536a00",
+					"tenant-id":    "a6e2367a-92ea-4e5a-b565-723830bcc095",
+				},
+			},
+		}
+		clientCfg.AuthInfos[CLI.Email] = newAuthInfo
+		authInfo = CLI.Email
+		log.Info().Msgf("Added %s authInfo", CLI.Email)
+		changed = true
+	}
 
 	// Remove clusters that
 	clustersToRemove := make([]string, 0)
