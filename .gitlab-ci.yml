@@ -33,6 +33,7 @@ build-develop-poster:
   only:
     refs:
       - master
+      - tags
     changes:
       - Dockerfile-poster
       - cmd/poster/**
