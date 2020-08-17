@@ -94,13 +94,13 @@ func main() {
 	}
 
 	// Add clusters & contexts we autodiscovered
-	clustersToAdd := make(map[string]api.Cluster)
-	contextsToAdd := make(map[string]api.Context)
+	clustersToAdd := make(map[string]*api.Cluster)
+	contextsToAdd := make(map[string]*api.Context)
 
 	for _, cluster := range clusters {
 		if _, exists := clientCfg.Clusters[cluster.Name]; !exists {
 			// Cluster does not exist
-			clustersToAdd[cluster.Name] = api.Cluster{
+			clustersToAdd[cluster.Name] = &api.Cluster{
 				Server:                   cluster.URL,
 				InsecureSkipTLSVerify:    false,
 				CertificateAuthorityData: []byte(cluster.CA),
@@ -109,7 +109,7 @@ func main() {
 		}
 		if _, exists := clientCfg.Contexts[cluster.Name]; !exists {
 			// Context does not exist
-			contextsToAdd[cluster.Name] = api.Context{
+			contextsToAdd[cluster.Name] = &api.Context{
 				Cluster:   cluster.Name,
 				AuthInfo:  authInfo,
 				Namespace: "default",
@@ -118,11 +118,11 @@ func main() {
 		}
 	}
 	for key, data := range clustersToAdd {
-		clientCfg.Clusters[key] = &data
+		clientCfg.Clusters[key] = data
 		changed = true
 	}
 	for key, data := range contextsToAdd {
-		clientCfg.Contexts[key] = &data
+		clientCfg.Contexts[key] = data
 		changed = true
 	}
 
