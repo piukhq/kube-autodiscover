@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/alecthomas/kong"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -20,13 +21,25 @@ type Cluster struct {
 	LastSeen time.Time `json:"-"`
 }
 
+var (
+	version   string
+	sha1      string
+	buildTime string
+)
+
 var CLI struct {
-	Email string `help:"Bink email to be used for Kubernetes auth" env:"BINK_KUBE_EMAIL"`
+	Email   string `help:"Bink email to be used for Kubernetes auth" env:"BINK_KUBE_EMAIL"`
+	Version bool   `help:"Displays version" short:"V"`
 }
 
 func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	kong.Parse(&CLI)
+
+	if CLI.Version {
+		fmt.Printf("Version: %s Git SHA: %s Build Time: %s\n", version, sha1, buildTime)
+		os.Exit(0)
+	}
 
 	req, err := http.NewRequest("GET", "https://cluster-autodiscover.uksouth.bink.sh", nil)
 	if err != nil {
