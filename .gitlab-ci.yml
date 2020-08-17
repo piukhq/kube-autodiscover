@@ -45,3 +45,19 @@ build-develop-poster:
     - docker tag "$CI_REGISTRY/kube-autodiscover-poster:latest" "$CI_REGISTRY/kube-autodiscover-poster:develop-$CI_COMMIT_SHORT_SHA"
     - docker push "$CI_REGISTRY/kube-autodiscover-poster:latest"
     - docker push "$CI_REGISTRY/kube-autodiscover-poster:develop-$CI_COMMIT_SHORT_SHA"
+
+build-develop-cli:
+  stage: build
+  image: golang:alpine
+  only:
+    refs:
+      - master
+    changes:
+      - cmd/b2k/**
+  script:
+    - go mod download
+    - go mod verify
+    - CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="-w -s" -o b2k cmd/b2k/main.go
+  artifacts:
+    paths:
+      - b2k
