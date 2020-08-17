@@ -33,7 +33,6 @@ build-develop-poster:
   only:
     refs:
       - master
-      - tags
     changes:
       - Dockerfile-poster
       - cmd/poster/**
@@ -53,6 +52,7 @@ build-develop-cli:
   only:
     refs:
       - master
+      - tags
     changes:
       - cmd/b2k/**
   script:
