@@ -21,7 +21,7 @@ type Cluster struct {
 }
 
 var CLI struct {
-	Email string `help:"Bink email to be used for Kube auth" env:"BINK_KUBE_EMAIL"`
+	Email string `help:"Bink email to be used for Kubernetes auth" env:"BINK_KUBE_EMAIL"`
 }
 
 func main() {
