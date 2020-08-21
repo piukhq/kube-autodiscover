@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/alecthomas/kong"
@@ -60,6 +61,11 @@ func main() {
 	}
 	resp.Body.Close()
 
+	clusterMap := make(map[string]*Cluster)
+	for index, cluster := range clusters {
+		clusterMap[cluster.Name] = &clusters[index]
+	}
+
 	log.Info().Msgf("Autodiscovered %d clusters", len(clusters))
 	// fmt.Printf("JSON: %#v\n\n\n", clusters)
 
@@ -105,8 +111,25 @@ func main() {
 	for k := range clientCfg.Clusters {
 		// If we start with a uksouth or ??? prefix, and we're not in the list of autodiscovered clusters
 		// remove
-		if validCluster(k) && !inClusterSlice(clusters, k) {
-			clustersToRemove = append(clustersToRemove, k)
+		if validCluster(k) {
+			if !inClusterSlice(clusters, k) {
+				clustersToRemove = append(clustersToRemove, k)
+			} else {
+				// Cluster exists, so check and fixup the data
+				if clientCfg.Clusters[k].Server != clusterMap[k].URL {
+					log.Info().Msgf("Updating cluster %s URL to %s", k, clusterMap[k].URL)
+					clientCfg.Clusters[k].Server = clusterMap[k].URL
+					changed = true
+				}
+
+				// Check CA is the same
+				clusterCA := []byte(clusterMap[k].CA)
+				if !bytes.Equal(clientCfg.Clusters[k].CertificateAuthorityData, clusterCA) {
+					log.Info().Msgf("Updating cluster %s CA", k)
+					clientCfg.Clusters[k].CertificateAuthorityData = clusterCA
+					changed = true
+				}
+			}
 		}
 	}
 	for k := range clientCfg.Contexts {
