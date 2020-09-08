@@ -2,8 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/justinas/alice"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/hlog"
 	"github.com/rs/zerolog/log"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 )
@@ -88,9 +92,27 @@ func handler(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
+	// Setup http logger
+	httpLogger := zerolog.New(os.Stdout).With().Timestamp().Str("type", "http").Logger()
+	c := alice.New()
+	c = c.Append(hlog.NewHandler(httpLogger))
+	c = c.Append(hlog.AccessHandler(func(r *http.Request, status, size int, duration time.Duration) {
+		hlog.FromRequest(r).Info().
+			Str("method", r.Method).
+			Stringer("url", r.URL).
+			Int("status", status).
+			Int("size", size).
+			Dur("duration", duration).
+			Msg("")
+	}))
+	c = c.Append(hlog.RemoteAddrHandler("ip"))
+	c = c.Append(hlog.UserAgentHandler("user_agent"))
+	c = c.Append(hlog.RefererHandler("referer"))
+	c = c.Append(hlog.RequestIDHandler("req_id", "Request-Id"))
+
 	http.HandleFunc("/livez", livez)
 	http.HandleFunc("/readyz", livez)
-	http.HandleFunc("/", handler)
+	http.Handle("/", c.Then(http.HandlerFunc(handler)))
 
 	log.Info().Msg("Serving on :9000")
 	err := http.ListenAndServe(":9000", nil)

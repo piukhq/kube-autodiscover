@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/alecthomas/kong v0.2.11
+	github.com/justinas/alice v1.2.0
 	github.com/rs/zerolog v1.19.0
 	k8s.io/client-go v0.18.2
 )
