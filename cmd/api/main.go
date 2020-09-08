@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/rs/zerolog/log"
 	"net/http"
+	"sync"
 	"time"
 )
 
@@ -15,6 +16,7 @@ type Cluster struct {
 }
 
 var ClusterMap = make(map[string]Cluster)
+var SyncMutex = sync.RWMutex{}
 
 const ClusterTimeout = 5 * time.Minute
 
@@ -40,7 +42,9 @@ func handler(w http.ResponseWriter, req *http.Request) {
 			w.WriteHeader(500)
 		} else {
 			c.LastSeen = time.Now()
+			SyncMutex.Lock()
 			ClusterMap[c.Name] = c
+			SyncMutex.Unlock()
 		}
 
 	} else if req.Method == "GET" {
@@ -48,6 +52,9 @@ func handler(w http.ResponseWriter, req *http.Request) {
 		now := time.Now()
 		toDelete := make([]string, 0)
 
+		SyncMutex.RLock()
+		// Loop through map and find clusters that have checked in recently
+		// and find old clusters for cleanup
 		for key, value := range ClusterMap {
 			if value.LastSeen.Add(ClusterTimeout).Before(now) {
 				toDelete = append(toDelete, key)
@@ -55,10 +62,14 @@ func handler(w http.ResponseWriter, req *http.Request) {
 				resp = append(resp, value)
 			}
 		}
+		SyncMutex.RUnlock()
 
+		SyncMutex.Lock()
+		// Clean up old clusters
 		for _, deleteKey := range toDelete {
 			delete(ClusterMap, deleteKey)
 		}
+		SyncMutex.Unlock()
 
 		respBytes, err := json.Marshal(resp)
 		if err != nil {
