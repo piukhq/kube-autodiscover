@@ -4,15 +4,16 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"os"
+	"strings"
+	"time"
+
 	"github.com/alecthomas/kong"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
-	"net/http"
-	"os"
-	"strings"
-	"time"
 )
 
 type Cluster struct {
@@ -30,7 +31,7 @@ var (
 
 var CLI struct {
 	Email   string `help:"Bink email to be used for Kubernetes auth" env:"BINK_KUBE_EMAIL"`
-	Version bool   `help:"Displays version" short:"V"`
+	Version bool   `help:"Display b2k version" short:"V"`
 }
 
 func main() {
