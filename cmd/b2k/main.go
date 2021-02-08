@@ -30,7 +30,7 @@ var (
 )
 
 var CLI struct {
-	Email   string `help:"Bink email to be used for Kubernetes auth" env:"BINK_KUBE_EMAIL"`
+	Email   string `help:"Bink email to be used for Kubernetes Auth" env:"BINK_KUBE_EMAIL"`
 	Version bool   `help:"Display b2k version" short:"V"`
 }
 

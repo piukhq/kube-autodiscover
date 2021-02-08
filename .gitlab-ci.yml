@@ -60,7 +60,9 @@ build-develop-cli:
     - go mod verify
     - CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -ldflags="-w -s -X main.sha1=$CI_COMMIT_SHA -X main.buildTime=$(date +'%Y-%m-%dT%T') -X main.version=$CI_COMMIT_TAG" -o b2k cmd/b2k/main.go
     - CGO_ENABLED=0 GOOS=linux GOARCH=386 go build -ldflags="-w -s -X main.sha1=$CI_COMMIT_SHA -X main.buildTime=$(date +'%Y-%m-%dT%T') -X main.version=$CI_COMMIT_TAG" -o b2k_linux_386 cmd/b2k/main.go
+    - CGO_ENABLED=0 GOOS=android GOARCH=arm64 go build -ldflags="-w -s -X main.sha1=$CI_COMMIT_SHA -X main.buildTime=$(date +'%Y-%m-%dT%T') -X main.version=$CI_COMMIT_TAG" -o b2k_android_arm64 cmd/b2k/main.go
   artifacts:
     paths:
       - b2k
       - b2k_linux_386
+      - b2k_android_arm64
