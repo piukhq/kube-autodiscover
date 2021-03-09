@@ -48,7 +48,7 @@ build-develop-poster:
 
 build-develop-cli:
   stage: build
-  image: golang:alpine
+  image: golang:1.16.0-alpine3.13
   only:
     refs:
       - master
