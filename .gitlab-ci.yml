@@ -14,9 +14,6 @@ build-develop-api:
   only:
     refs:
       - master
-    changes:
-      - Dockerfile-api
-      - cmd/api/**
   services:
     - docker:dind
   before_script:
@@ -33,9 +30,6 @@ build-develop-poster:
   only:
     refs:
       - master
-    changes:
-      - Dockerfile-poster
-      - cmd/poster/**
   services:
     - docker:dind
   before_script:
@@ -53,8 +47,6 @@ build-develop-cli:
     refs:
       - master
       - tags
-    changes:
-      - cmd/b2k/**
   script:
     - go mod download
     - go mod verify
