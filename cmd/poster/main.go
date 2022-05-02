@@ -3,11 +3,12 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/rs/zerolog/log"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
 func main() {

@@ -2,14 +2,15 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/justinas/alice"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/hlog"
-	"github.com/rs/zerolog/log"
 	"net/http"
 	"os"
 	"sync"
 	"time"
+
+	"github.com/justinas/alice"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/hlog"
+	"github.com/rs/zerolog/log"
 )
 
 type Cluster struct {

@@ -1,10 +1,10 @@
-module git.bink.com/tools/kube-autodiscover
+module github.com/binkhq/kube-autodiscover
 
 go 1.14
 
 require (
-	github.com/alecthomas/kong v0.2.11
+	github.com/alecthomas/kong v0.5.0
 	github.com/justinas/alice v1.2.0
-	github.com/rs/zerolog v1.19.0
-	k8s.io/client-go v0.18.2
+	github.com/rs/zerolog v1.26.1
+	k8s.io/client-go v0.23.6
 )
