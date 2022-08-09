@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
@@ -28,7 +27,7 @@ func main() {
 	}
 	log.Info().Msgf("Sening cluster info to %s", url)
 
-	ca_cert, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/ca.crt")
+	ca_cert, err := os.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/ca.crt")
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to get kube CA cert")
 	}
