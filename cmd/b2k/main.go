@@ -89,14 +89,22 @@ func main() {
 		}
 
 		newAuthInfo := &api.AuthInfo{
-			AuthProvider: &api.AuthProviderConfig{
-				Name: "azure",
-				Config: map[string]string{
-					"client-id":    "aeb43981-c317-4f08-97be-aeed19f91cb1",
-					"environment":  "AzurePublicCloud",
-					"apiserver-id": "d250be93-618a-45e5-b9cf-6a156f536a00",
-					"tenant-id":    "a6e2367a-92ea-4e5a-b565-723830bcc095",
+			Exec: &api.ExecConfig{
+				Command: "kubelogin",
+				Args: []string{
+					"get-token",
+					"--login",
+					"devicecode",
+					"--server-id",
+					"6dae42f8-4368-4678-94ff-3960e28e3630",
+					"--client-id",
+					"80faf920-1908-4b52-b5ef-a8e7bedfc67a",
+					"--tenant-id",
+					"a6e2367a-92ea-4e5a-b565-723830bcc095",
+					"--environment",
+					"AzurePublicCloud",
 				},
+				APIVersion: "client.authentication.k8s.io/v1beta1",
 			},
 		}
 		clientCfg.AuthInfos[CLI.Email] = newAuthInfo
