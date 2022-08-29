@@ -23,7 +23,7 @@ func main() {
 
 	url := os.Getenv("API")
 	if url == "" {
-		url = "https://cluster-autodiscover.uksouth.bink.sh"
+		url = "https://cluster-autodiscover.tools.uksouth.bink.sh"
 	}
 	log.Info().Msgf("Sening cluster info to %s", url)
 

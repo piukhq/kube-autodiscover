@@ -43,7 +43,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	req, err := http.NewRequest("GET", "https://cluster-autodiscover.uksouth.bink.sh", nil)
+	req, err := http.NewRequest("GET", "https://cluster-autodiscover.tools.uksouth.bink.sh", nil)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to make POST request")
 	}
