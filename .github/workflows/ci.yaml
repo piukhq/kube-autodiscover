@@ -59,7 +59,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
         with:
-          go-version: '1.18.1'
+          go-version: '1.19.0'
       - run: go mod download
       - run: go mod verify
       - run: CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -ldflags="-w -s -X main.sha1=$GITHUB_SHA -X main.buildTime=$(date +'%Y-%m-%dT%T') -X main.version=$GITHUB_REF_NAME" -o b2k_darwin_arm64 cmd/b2k/main.go
